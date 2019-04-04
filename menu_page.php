@@ -37,20 +37,13 @@ function csv_view_post(){
   $report_type_arr = getTermsArr('report-type');
 
 
-   //echo "<pre>";
-   //print_r( $locations_arr );
-   //echo "</pre>";
-
    $csv_helper = new CSV_HELPERR;
    $arrayCsv = $csv_helper->exportToArray( plugin_dir_url(__FILE__).'soah.csv' );
 
-  // echo '<pre>';
-  // print_r($arrayCsv);
-  // echo '</pre>';
-
    $i = 0;
    foreach ($arrayCsv as $rowCsv ) {
-     if( $i == 4 ){
+     // while( $i<=100 )
+     if( $i>=1 && $i<=50 ){
       $new_post = array(
           'post_title'  =>  $rowCsv[1],
           'post_content'=>  $rowCsv[4],
@@ -58,30 +51,30 @@ function csv_view_post(){
           'post_status' =>  'publish',
           'post_type'   =>  'reports'
       );
-      // $post_id = wp_insert_post($new_post);
-      $location_id_arr = array();
+      $post_id = wp_insert_post($new_post);
 
+      $location_id_arr = array();
       $locations = explode(',',$rowCsv[3]);
-       // echo '<pre>';
-       // print_r($locations);
-       // echo '<pre>';
-       // Add locations
       foreach( $locations as $location_str ){
          $location_slug = customSlugify( $location_str );
          if( isset( $locations_arr[ $location_slug ] ) ){
            array_push( $location_id_arr, $locations_arr[ $location_slug ] );
         }
       }
-
+      wp_set_post_terms( $post_id, $location_id_arr, 'locations' );
 
       // Add report-type if not exists
-      $term = term_exists();
+      $report_type_id_arr = array();
       $report_types = explode(',',$rowCsv[5]);
       foreach( $report_types as $report_str ){
-      $reports =  $report_str.'<br>';
+        $term = term_exists($report_str,'report-type');
+        if(!$term){
+          $term = wp_insert_term( $report_str, 'report-type' );
+        }
+        array_push( $report_type_id_arr, $term['term_id'] );
       }
-      // wp_set_post_terms( $post_id, $location_id_arr, 'locations' );
+      wp_set_post_terms( $post_id, $report_type_id_arr, 'report-type' );
    }
-   $i++;
+ $i++;
  }
 }
