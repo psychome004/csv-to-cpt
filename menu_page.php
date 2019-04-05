@@ -3,13 +3,13 @@
 add_action('admin_menu', 'csv_menu_page');
 function csv_menu_page(){
    add_menu_page('CSV IMPORT', 'CSV IMPORT', 'manage_options' , 'csv_import', 'csv_view_post' );
-   // add_submenu_page('csv_import', 'Import Locations', 'Import Locations', 'manage_options', 'states_import', 'import_locations' );
+   add_submenu_page('csv_import', 'Import Locations', 'Post Children', 'manage_options', 'post_children', 'import_children_posts' );
    // add_submenu_page('my-menu', 'Submenu Page Title2', 'Whatever You Want2', 'manage_options', 'my-menu2' );
 }
 
-// function import_locations(){
-//   include "statescsv.php";
-// }
+function import_children_posts(){
+  include ('import-children-posts.php');
+}
 
 function customSlugify( $label ){
   return preg_replace('/\s+/', '', strtoupper( $label ));
